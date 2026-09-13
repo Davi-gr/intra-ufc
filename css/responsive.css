@@ -1,0 +1,23 @@
+@media (min-width: 720px) {
+	.site-header {
+		padding: 0 2rem;
+	}
+
+	.map-section {
+		padding: 5rem 0 6rem;
+	}
+
+	.map-layout {
+		grid-template-columns: minmax(0, 1.7fr) minmax(16rem, 0.8fr);
+		align-items: stretch;
+		gap: 1.5rem;
+	}
+
+	.map-placeholder {
+		min-height: 34rem;
+	}
+
+	.stops-panel {
+		padding: 2rem;
+	}
+}
