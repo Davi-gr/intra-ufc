@@ -1,23 +1,141 @@
-@media (min-width: 720px) {
+/**
+ * Estilos Responsivos & Mobile-First para INTRA UFC (PWA)
+ */
+
+/* ==========================================================================
+   MOBILE DEFAULT (< 768px)
+   ========================================================================== */
+
+/* Ajustes gerais de espaçamento no mobile */
+.site-header {
+	padding: 0 1rem;
+	padding-top: env(safe-area-inset-top, 0);
+	min-height: 3.8rem;
+}
+
+.map-section {
+	padding: 1.25rem 0 2.5rem;
+	padding-bottom: max(2rem, env(safe-area-inset-bottom, 1rem));
+}
+
+.section-heading {
+	margin-bottom: 1.25rem;
+}
+
+.section-heading h1 {
+	font-size: clamp(1.8rem, 8vw, 2.8rem);
+	margin-bottom: 0.5rem;
+}
+
+.section-heading__description {
+	font-size: 0.92rem;
+}
+
+/* Layout em coluna única */
+.map-layout {
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+}
+
+.map-wrapper {
+	border-radius: 8px;
+}
+
+#map {
+	min-height: 56vh;
+	height: 56vh;
+	width: 100%;
+}
+
+/* Gaveta inferior no mobile */
+.stops-panel {
+	border-radius: 8px;
+	padding: 0.75rem 1.25rem 1.25rem;
+	transition: max-height 0.3s ease-out;
+}
+
+.drawer-handle-bar {
+	display: block;
+}
+
+.drawer-handle {
+	width: 44px;
+	height: 5px;
+	background-color: var(--color-line);
+	border-radius: 3px;
+	margin: 0 auto 0.75rem;
+}
+
+/* Mobile: Colapsar/Expandir paradas */
+.stops-panel.collapsed .stops-list {
+	display: none;
+}
+
+.stops-panel.collapsed {
+	cursor: pointer;
+}
+
+/* Botões com área de toque mínima de 44px para dedos */
+.stops-list button {
+	min-height: 44px;
+	padding: 0.65rem 0.25rem;
+}
+
+/* Status do ônibus compacto */
+.live-status-bar {
+	border-radius: 8px;
+	padding: 0.65rem 1rem;
+	font-size: 0.85rem;
+}
+
+/* ==========================================================================
+   TABLET & DESKTOP (>= 768px)
+   ========================================================================== */
+@media (min-width: 768px) {
 	.site-header {
 		padding: 0 2rem;
+		min-height: 4.5rem;
 	}
 
 	.map-section {
-		padding: 5rem 0 6rem;
+		padding: 3.5rem 0 5rem;
+	}
+
+	.section-heading {
+		margin-bottom: 2rem;
 	}
 
 	.map-layout {
-		grid-template-columns: minmax(0, 1.7fr) minmax(16rem, 0.8fr);
+		display: grid;
+		grid-template-columns: minmax(0, 1.8fr) minmax(18rem, 1fr);
 		align-items: stretch;
 		gap: 1.5rem;
 	}
 
 	#map {
-		min-height: 34rem;
+		min-height: 38rem;
+		height: 38rem;
 	}
 
 	.stops-panel {
 		padding: 2rem;
+		border-radius: 4px;
+	}
+
+	.drawer-handle-bar {
+		display: none;
+	}
+
+	.stops-panel.collapsed .stops-list {
+		display: grid;
+	}
+}
+
+/* Telas ultra-wide / desktop grandes */
+@media (min-width: 1200px) {
+	#map {
+		min-height: 42rem;
+		height: 42rem;
 	}
 }

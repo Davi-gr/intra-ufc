@@ -1,20 +1,75 @@
 /**
- * Lógica principal da aplicação INTRA UFC.
- * Renderiza o mapa interativo, rotas, paradas e o rastreamento em tempo real do ônibus.
+ * Lógica principal da aplicação INTRA UFC (PWA & Mobile-First).
+ * Controla o mapa interativo, rotas, paradas, rastreamento do ônibus,
+ * geolocalização do usuário e instalação do PWA.
  */
 
-// 1. Inicialização do Mapa
-const map = L.map("map").setView(
+// ==========================================================================
+// 1. Registro do Service Worker (PWA)
+// ==========================================================================
+if ("serviceWorker" in navigator) {
+	window.addEventListener("load", () => {
+		navigator.serviceWorker
+			.register("sw.js")
+			.then((reg) => {
+				console.log("Service Worker do INTRA UFC registrado com sucesso:", reg.scope);
+			})
+			.catch((err) => {
+				console.warn("Falha ao registrar Service Worker:", err);
+			});
+	});
+}
+
+// Suporte à instalação do PWA
+let promptInstalacao = null;
+const btnInstalar = document.getElementById("pwa-install-btn");
+
+window.addEventListener("beforeinstallprompt", (evento) => {
+	evento.preventDefault();
+	promptInstalacao = evento;
+	if (btnInstalar) {
+		btnInstalar.hidden = false;
+	}
+});
+
+if (btnInstalar) {
+	btnInstalar.addEventListener("click", async () => {
+		if (!promptInstalacao) return;
+		promptInstalacao.prompt();
+		const resultado = await promptInstalacao.userChoice;
+		if (resultado.outcome === "accepted") {
+			btnInstalar.hidden = true;
+		}
+		promptInstalacao = null;
+	});
+}
+
+window.addEventListener("appinstalled", () => {
+	if (btnInstalar) btnInstalar.hidden = true;
+	console.log("App INTRA UFC instalado com sucesso!");
+});
+
+// ==========================================================================
+// 2. Inicialização do Mapa Leaflet
+// ==========================================================================
+const map = L.map("map", {
+	zoomControl: false, // reposicionaremos para melhorar ergonomia no mobile
+}).setView(
 	[INTRA_DATA.centro.lat, INTRA_DATA.centro.lng],
 	INTRA_DATA.centro.zoom
 );
+
+// Zoom control no topo direito para não colidir com os botões flutuantes da mão direita
+L.control.zoom({ position: "topright" }).addTo(map);
 
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 	maxZoom: 19,
 	attribution: "&copy; OpenStreetMap contributors",
 }).addTo(map);
 
-// 2. Traçado das Rotas de Ida e Volta
+// ==========================================================================
+// 3. Traçado das Rotas de Ida e Volta
+// ==========================================================================
 const rotaIdaLayer = L.polyline(INTRA_DATA.rotas.ida.coordenadas, {
 	color: INTRA_DATA.rotas.ida.cor,
 	weight: INTRA_DATA.rotas.ida.peso,
@@ -31,12 +86,13 @@ const rotaVoltaLayer = L.polyline(INTRA_DATA.rotas.volta.coordenadas, {
 	.addTo(map)
 	.bindPopup(`<strong>${INTRA_DATA.rotas.volta.nome}</strong>`);
 
-// 3. Renderização das Paradas e Painel Lateral
+// ==========================================================================
+// 4. Renderização das Paradas e Painel Lateral
+// ==========================================================================
 const marcadoresParadas = {};
 const stopsListEl = document.getElementById("stops-list");
 
 INTRA_DATA.paradas.forEach((parada, index) => {
-	// Ícone personalizado para a parada
 	const stopIcon = L.divIcon({
 		className: "custom-stop-marker-wrapper",
 		html: `<div class="custom-stop-marker">${index + 1}</div>`,
@@ -56,7 +112,6 @@ INTRA_DATA.paradas.forEach((parada, index) => {
 
 	marcadoresParadas[parada.id] = marker;
 
-	// Inserir item clicável no painel lateral
 	if (stopsListEl) {
 		const li = document.createElement("li");
 		const button = document.createElement("button");
@@ -71,7 +126,19 @@ INTRA_DATA.paradas.forEach((parada, index) => {
 	}
 });
 
-// 4. Rastreamento do Ônibus em Tempo Real
+// Controle da Gaveta (Drawer) no Mobile
+const stopsPanelEl = document.getElementById("stops-panel");
+const drawerToggleEl = document.getElementById("drawer-toggle");
+
+if (stopsPanelEl && drawerToggleEl) {
+	drawerToggleEl.addEventListener("click", () => {
+		stopsPanelEl.classList.toggle("collapsed");
+	});
+}
+
+// ==========================================================================
+// 5. Rastreamento do Ônibus em Tempo Real
+// ==========================================================================
 const busIcon = L.divIcon({
 	className: "custom-bus-marker-wrapper",
 	html: `<div class="custom-bus-marker" title="Ônibus Intracampus">🚌</div>`,
@@ -81,6 +148,7 @@ const busIcon = L.divIcon({
 });
 
 let busMarker = null;
+let ultimaPosicaoOnibus = null;
 const liveDotEl = document.getElementById("live-dot");
 const liveStatusTextEl = document.getElementById("live-status-text");
 
@@ -132,6 +200,7 @@ function processarDadosOnibus(dados) {
 
 	const info = dados.onibus[0];
 	const pos = [info.lat, info.lng];
+	ultimaPosicaoOnibus = pos;
 
 	const popupHtml = `
 		<div style="font-family: var(--font-body); min-width: 170px;">
@@ -163,19 +232,18 @@ function processarDadosOnibus(dados) {
 }
 
 function lidarComErroRastreamento(erro) {
-	// Se for erro de CORS ao abrir direto via file:// ou sem backend proxy
 	const ehErroRedeOuCors = erro.name === "TypeError" || erro.name === "AbortError";
-	
+
 	if (ehErroRedeOuCors) {
 		atualizarStatusUI(
 			"espera",
 			"Aguardando servidor de dados (conecte via proxy se executar localmente)"
 		);
-		
-		// Posiciona o marcador na primeira parada como demonstração se ainda não houver marcador
+
 		if (!busMarker) {
 			const paradaInicial = INTRA_DATA.paradas[0];
-			busMarker = L.marker([paradaInicial.lat, paradaInicial.lng], { icon: busIcon, zIndexOffset: 1000 })
+			ultimaPosicaoOnibus = [paradaInicial.lat, paradaInicial.lng];
+			busMarker = L.marker(ultimaPosicaoOnibus, { icon: busIcon, zIndexOffset: 1000 })
 				.addTo(map)
 				.bindPopup(`
 					<div style="font-family: var(--font-body);">
@@ -190,6 +258,85 @@ function lidarComErroRastreamento(erro) {
 	} else {
 		atualizarStatusUI("espera", "Sinal do ônibus temporariamente indisponível.");
 	}
+}
+
+// ==========================================================================
+// 6. Botões Flutuantes de Ação Rápida (FABs)
+// ==========================================================================
+const btnTrackBus = document.getElementById("btn-track-bus");
+const btnMyLocation = document.getElementById("btn-my-location");
+const btnRefreshLive = document.getElementById("btn-refresh-live");
+
+// Centralizar no ônibus
+if (btnTrackBus) {
+	btnTrackBus.addEventListener("click", () => {
+		if (ultimaPosicaoOnibus) {
+			map.flyTo(ultimaPosicaoOnibus, 16, { duration: 1.2 });
+			if (busMarker) busMarker.openPopup();
+		} else {
+			alert("A posição do ônibus ainda não foi localizada.");
+		}
+	});
+}
+
+// Minha Localização (GPS do Smartphone / Navegador)
+let userLocationMarker = null;
+
+if (btnMyLocation) {
+	btnMyLocation.addEventListener("click", () => {
+		if (!navigator.geolocation) {
+			alert("Seu navegador não suporta geolocalização.");
+			return;
+		}
+
+		btnMyLocation.style.opacity = "0.5";
+
+		navigator.geolocation.getCurrentPosition(
+			(pos) => {
+				btnMyLocation.style.opacity = "1";
+				const userPos = [pos.coords.latitude, pos.coords.longitude];
+
+				const userIcon = L.divIcon({
+					className: "user-location-marker-wrapper",
+					html: `<div class="user-location-marker" title="Você está aqui"></div>`,
+					iconSize: [18, 18],
+					iconAnchor: [9, 9],
+				});
+
+				if (!userLocationMarker) {
+					userLocationMarker = L.marker(userPos, { icon: userIcon, zIndexOffset: 900 })
+						.addTo(map)
+						.bindPopup("<strong>Você está aqui</strong>");
+				} else {
+					userLocationMarker.setLatLng(userPos);
+				}
+
+				map.flyTo(userPos, 16, { duration: 1.2 });
+				userLocationMarker.openPopup();
+			},
+			(erro) => {
+				btnMyLocation.style.opacity = "1";
+				let msg = "Não foi possível obter sua localização.";
+				if (erro.code === erro.PERMISSION_DENIED) {
+					msg = "Permissão de localização negada pelo usuário.";
+				}
+				alert(msg);
+			},
+			{ enableHighAccuracy: true, timeout: 8000 }
+		);
+	});
+}
+
+// Atualizar Sinal Imediatamente
+if (btnRefreshLive) {
+	btnRefreshLive.addEventListener("click", () => {
+		btnRefreshLive.style.transform = "rotate(360deg)";
+		buscarPosicaoOnibus().finally(() => {
+			setTimeout(() => {
+				btnRefreshLive.style.transform = "";
+			}, 400);
+		});
+	});
 }
 
 // Iniciar polling a cada 10 segundos

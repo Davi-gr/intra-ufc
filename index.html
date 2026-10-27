@@ -2,12 +2,27 @@
 <html lang="pt-BR">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover"
+		/>
 		<meta
 			name="description"
-			content="Consulte as rotas e paradas do transporte intracampus da UFC Sobral."
+			content="Acompanhamento em tempo real, rotas e paradas do transporte intracampus da UFC Sobral."
 		/>
 		<title>INTRA UFC | Transporte intracampus</title>
+
+		<!-- Configurações PWA e Mobile-First -->
+		<link rel="manifest" href="manifest.webmanifest" />
+		<meta name="theme-color" content="#172b3a" />
+		<meta name="mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+		<meta name="apple-mobile-web-app-title" content="Intra UFC" />
+		<link rel="icon" type="image/svg+xml" href="icons/icon.svg" />
+		<link rel="apple-touch-icon" href="icons/icon-192.png" />
+
+		<!-- Estilos da Aplicação -->
 		<link rel="stylesheet" href="css/global.css" />
 		<link rel="stylesheet" href="css/components.css" />
 		<link rel="stylesheet" href="css/responsive.css" />
@@ -21,8 +36,13 @@
 		<header class="site-header">
 			<a class="brand" href="index.html" aria-label="INTRA UFC - inicio">
 				<span class="brand__mark" aria-hidden="true">IU</span>
-				<span>INTRA UFC</span>
+				<span class="brand__title">INTRA UFC</span>
 			</a>
+
+			<!-- Botão de Instalação PWA (visível quando disponível no navegador) -->
+			<button id="pwa-install-btn" class="btn-install" hidden type="button">
+				<span class="install-icon">📲</span> Instalar App
+			</button>
 		</header>
 
 		<main>
@@ -33,10 +53,11 @@
 						<h1 id="mapa-titulo">Mapa do Intracampus</h1>
 						<p class="section-heading__description">
 							Encontre as principais paradas e planeje seu deslocamento entre os
-							campus da UFC Sobral.
+							campi da UFC Sobral.
 						</p>
 					</div>
 
+					<!-- Barra de Status do Ônibus e Legenda -->
 					<div class="live-status-bar">
 						<div class="live-status-indicator">
 							<span class="live-dot waiting" id="live-dot"></span>
@@ -49,21 +70,64 @@
 					</div>
 
 					<div class="map-layout">
-						<div id="map" aria-label="Mapa interativo da UFC Sobral"></div>
+						<!-- Container do Mapa com Controles Flutuantes (FABs) -->
+						<div class="map-wrapper">
+							<div id="map" aria-label="Mapa interativo da UFC Sobral"></div>
 
-						<aside class="stops-panel" aria-labelledby="paradas-titulo">
-							<div>
-								<p class="eyebrow">Pontos de referencia</p>
-								<h2 id="paradas-titulo">Principais paradas</h2>
+							<!-- Botões de Ação Rápida Flutuantes (Mobile-First) -->
+							<div class="map-fab-container">
+								<button
+									id="btn-track-bus"
+									class="map-fab"
+									type="button"
+									title="Centralizar no Ônibus"
+									aria-label="Centralizar no Ônibus"
+								>
+									🚌
+								</button>
+								<button
+									id="btn-my-location"
+									class="map-fab"
+									type="button"
+									title="Minha Localização GPS"
+									aria-label="Minha Localização GPS"
+								>
+									📍
+								</button>
+								<button
+									id="btn-refresh-live"
+									class="map-fab"
+									type="button"
+									title="Atualizar Sinal"
+									aria-label="Atualizar Sinal"
+								>
+									🔄
+								</button>
+							</div>
+						</div>
+
+						<!-- Painel de Paradas (Gaveta/Bottom Sheet no Mobile, Lateral no Desktop) -->
+						<aside class="stops-panel" id="stops-panel" aria-labelledby="paradas-titulo">
+							<div class="drawer-handle-bar" id="drawer-toggle" role="button" tabindex="0" aria-label="Expandir ou recolher lista de paradas">
+								<div class="drawer-handle"></div>
+							</div>
+							<div class="stops-panel-header">
+								<div>
+									<p class="eyebrow">Pontos de referência</p>
+									<h2 id="paradas-titulo">Principais paradas</h2>
+								</div>
+								<span class="drawer-badge" id="stops-count-badge">6 paradas</span>
 							</div>
 							<ul class="stops-list" id="stops-list">
-								<!-- Preenchido via JavaScript para permitir foco no mapa ao clicar -->
+								<!-- Preenchido dinamicamente via JS -->
 							</ul>
 						</aside>
 					</div>
 				</div>
 			</section>
 		</main>
+
+		<!-- Scripts -->
 		<script
 			src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
 			integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="

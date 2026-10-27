@@ -12,6 +12,9 @@ PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8000
 API_REMOTE_URL = "https://sobral.179.197.66.83.sslip.io/onibus/ao-vivo"
 
 class ProxyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
+    extensions_map = http.server.SimpleHTTPRequestHandler.extensions_map.copy()
+    extensions_map['.webmanifest'] = 'application/manifest+json'
+
     def do_GET(self):
         if self.path.startswith("/api/onibus/ao-vivo"):
             try:
@@ -48,3 +51,4 @@ if __name__ == "__main__":
         httpd.serve_forever()
     except KeyboardInterrupt:
         print("\nServidor encerrado.")
+

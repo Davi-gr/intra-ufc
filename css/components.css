@@ -266,3 +266,148 @@
 	font-weight: bold;
 }
 
+/* Botão Instalar App PWA */
+.btn-install {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	margin-left: auto;
+	padding: 0.45rem 0.9rem;
+	border: 1px solid var(--color-accent);
+	border-radius: 999px;
+	background: var(--color-accent);
+	color: #ffffff;
+	font-family: var(--font-body);
+	font-size: 0.8rem;
+	font-weight: 700;
+	cursor: pointer;
+	box-shadow: 0 2px 6px rgba(232, 106, 58, 0.25);
+	transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.btn-install:hover {
+	background: var(--color-accent-dark);
+}
+
+.btn-install:active {
+	transform: scale(0.96);
+}
+
+/* Wrapper do Mapa com Controles Flutuantes (Mobile-First) */
+.map-wrapper {
+	position: relative;
+	border: 1px solid var(--color-line);
+	overflow: hidden;
+}
+
+#map {
+	width: 100%;
+	min-height: 24rem;
+	border: none;
+}
+
+.map-fab-container {
+	position: absolute;
+	right: 14px;
+	bottom: 20px;
+	z-index: 1000;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.map-fab {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	background: var(--color-surface);
+	border: 1px solid var(--color-line);
+	border-radius: 50%;
+	box-shadow: 0 3px 8px rgba(0, 0, 0, 0.18);
+	color: var(--color-ink);
+	font-size: 1.25rem;
+	cursor: pointer;
+	touch-action: manipulation;
+	transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.map-fab:hover {
+	background: #ffffff;
+	transform: scale(1.06);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.map-fab:active {
+	transform: scale(0.92);
+}
+
+/* Marcador da Localização do Usuário (GPS) */
+.user-location-marker {
+	width: 18px;
+	height: 18px;
+	background: #2563eb;
+	border: 3px solid #ffffff;
+	border-radius: 50%;
+	box-shadow: 0 0 10px rgba(37, 99, 235, 0.6);
+	position: relative;
+}
+
+.user-location-marker::after {
+	content: "";
+	position: absolute;
+	top: -6px;
+	left: -6px;
+	right: -6px;
+	bottom: -6px;
+	border-radius: 50%;
+	border: 2px solid #60a5fa;
+	animation: pulse-user 1.8s ease-out infinite;
+}
+
+@keyframes pulse-user {
+	0% {
+		transform: scale(0.8);
+		opacity: 1;
+	}
+	100% {
+		transform: scale(2);
+		opacity: 0;
+	}
+}
+
+/* Gaveta de Paradas / Bottom Sheet (Mobile-First) */
+.drawer-handle-bar {
+	display: none;
+	width: 100%;
+	padding: 8px 0;
+	cursor: pointer;
+	touch-action: manipulation;
+}
+
+.drawer-handle {
+	width: 40px;
+	height: 4px;
+	margin: 0 auto;
+	background-color: var(--color-line);
+	border-radius: 2px;
+}
+
+.stops-panel-header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+}
+
+.drawer-badge {
+	display: inline-block;
+	padding: 0.2rem 0.6rem;
+	background: rgba(23, 43, 58, 0.08);
+	border-radius: 999px;
+	font-size: 0.72rem;
+	font-weight: 700;
+	color: var(--color-muted);
+}
+
+
