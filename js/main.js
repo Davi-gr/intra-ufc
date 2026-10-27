@@ -344,10 +344,10 @@ INTRA_DATA.paradas.forEach((parada, index) => {
 		.addTo(map)
 		.bindPopup(`
 			<div style="font-family: var(--font-body); padding: 2px;">
-				<strong style="color: var(--color-ink); font-size: 1rem;">${parada.nome}</strong>
-				<p style="margin: 4px 0 0; color: var(--color-muted); font-size: 0.85rem;">Parada #${index + 1} do Intracampus UFC</p>
+				<strong style="color: var(--color-ink); font-size: 0.95rem;">${parada.nome}</strong>
+				<p style="margin: 4px 0 0; color: var(--color-muted); font-size: 0.8rem;">Parada #${index + 1} do Intracampus UFC</p>
 			</div>
-		`);
+		`, { autoPanPadding: [20, 85], maxWidth: 260 });
 
 	marcadoresParadas[parada.id] = marker;
 
@@ -359,21 +359,41 @@ INTRA_DATA.paradas.forEach((parada, index) => {
 		button.addEventListener("click", () => {
 			map.flyTo([parada.lat, parada.lng], 16, { duration: 1.2 });
 			marker.openPopup();
+			// No mobile, fecha a gaveta ao selecionar uma parada para exibir o mapa livre
+			if (window.innerWidth < 768 && stopsPanelEl) {
+				stopsPanelEl.classList.remove("expanded");
+			}
 		});
 		li.appendChild(button);
 		stopsListEl.appendChild(li);
 	}
 });
 
-// Controle da Gaveta (Drawer) no Mobile
+// Controle da Gaveta (Bottom Sheet) no Mobile
 const stopsPanelEl = document.getElementById("stops-panel");
 const drawerToggleEl = document.getElementById("drawer-toggle");
+const stopsPanelHeader = document.querySelector(".stops-panel-header");
 
-if (stopsPanelEl && drawerToggleEl) {
-	drawerToggleEl.addEventListener("click", () => {
-		stopsPanelEl.classList.toggle("collapsed");
-	});
+function alternarGavetaParadas() {
+	if (stopsPanelEl && window.innerWidth < 768) {
+		stopsPanelEl.classList.toggle("expanded");
+	}
 }
+
+if (drawerToggleEl) {
+	drawerToggleEl.addEventListener("click", alternarGavetaParadas);
+}
+
+if (stopsPanelHeader) {
+	stopsPanelHeader.addEventListener("click", alternarGavetaParadas);
+}
+
+// Ao tocar no mapa, recolhe a gaveta se ela estiver aberta no celular
+map.on("click", () => {
+	if (stopsPanelEl && stopsPanelEl.classList.contains("expanded") && window.innerWidth < 768) {
+		stopsPanelEl.classList.remove("expanded");
+	}
+});
 
 // ==========================================================================
 // 5. Rastreamento do Ônibus em Tempo Real (com Ícone Vetorial SVG)
@@ -469,7 +489,7 @@ function processarDadosOnibus(dados) {
 	if (!busMarker) {
 		busMarker = L.marker(pos, { icon: busIcon, zIndexOffset: 1000 })
 			.addTo(map)
-			.bindPopup(popupHtml);
+			.bindPopup(popupHtml, { autoPanPadding: [20, 85], maxWidth: 280 });
 	} else {
 		busMarker.setLatLng(pos);
 		busMarker.setPopupContent(popupHtml);

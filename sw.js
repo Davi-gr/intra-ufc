@@ -4,7 +4,7 @@
  * enquanto mantém o sinal de GPS do ônibus sempre em tempo real.
  */
 
-const CACHE_NAME = "intra-ufc-v5";
+const CACHE_NAME = "intra-ufc-v6";
 
 const ASSETS_APP_SHELL = [
 	"./",
