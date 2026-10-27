@@ -314,8 +314,8 @@
 .btn-install {
 	display: inline-flex;
 	align-items: center;
+	justify-content: center;
 	gap: 0.35rem;
-	margin-left: auto;
 	padding: 0.4rem 0.75rem;
 	flex-shrink: 0;
 	white-space: nowrap;
