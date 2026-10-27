@@ -508,7 +508,7 @@ function lidarComErroRastreamento(erro) {
 	if (ehErroRedeOuCors) {
 		atualizarStatusUI(
 			"espera",
-			"Aguardando servidor de dados (conecte via proxy se executar localmente)"
+			"Aguardando servidor de dados verifique sua conexão"
 		);
 
 		if (!busMarker) {
