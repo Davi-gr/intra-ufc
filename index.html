@@ -42,17 +42,31 @@
 			<!-- Menu de Navegação / Alternância -->
 			<nav class="header-nav">
 				<button id="nav-btn-mapa" class="nav-tab active" type="button">
-					<span class="tab-icon">🗺️</span> <span class="tab-label">Mapa</span>
+					<svg class="tab-icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>
+						<line x1="8" y1="2" x2="8" y2="18"/>
+						<line x1="16" y1="6" x2="16" y2="22"/>
+					</svg>
+					<span class="tab-label">Mapa</span>
 				</button>
 				<button id="nav-btn-avisos" class="nav-tab" type="button" aria-haspopup="dialog" aria-expanded="false">
-					<span class="tab-icon">🔔</span> <span class="tab-label">Avisos</span>
+					<svg class="tab-icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+						<path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+					</svg>
+					<span class="tab-label">Avisos</span>
 					<span class="nav-badge" id="avisos-badge" hidden>0</span>
 				</button>
 			</nav>
 
 			<!-- Botão de Instalação PWA (oculto quando detectado como instalado) -->
 			<button id="pwa-install-btn" class="btn-install" hidden type="button">
-				<span class="install-icon">📲</span> Instalar App
+				<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+					<polyline points="7 10 12 15 17 10"/>
+					<line x1="12" y1="15" x2="12" y2="3"/>
+				</svg>
+				<span>Instalar App</span>
 			</button>
 		</header>
 
@@ -101,7 +115,7 @@
 						<div class="map-wrapper">
 							<div id="map" aria-label="Mapa interativo da UFC Sobral"></div>
 
-							<!-- Botões de Ação Rápida Flutuantes (Mobile-First) -->
+							<!-- Botões de Ação Rápida Flutuantes (Mobile-First com SVG) -->
 							<div class="map-fab-container">
 								<button
 									id="btn-track-bus"
@@ -110,7 +124,13 @@
 									title="Centralizar no Ônibus"
 									aria-label="Centralizar no Ônibus"
 								>
-									🚌
+									<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+										<path d="M19 17h2l.64-2.54a3 3 0 0 0-.64-2.46L19 10V6a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v4l-2 2a3 3 0 0 0-.64 2.46L3 17h2"/>
+										<path d="M14 17H10"/>
+										<circle cx="7" cy="17" r="2"/>
+										<circle cx="17" cy="17" r="2"/>
+										<line x1="5" y1="10" x2="19" y2="10"/>
+									</svg>
 								</button>
 								<button
 									id="btn-my-location"
@@ -119,7 +139,14 @@
 									title="Minha Localização GPS"
 									aria-label="Minha Localização GPS"
 								>
-									📍
+									<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+										<circle cx="12" cy="12" r="3"/>
+										<circle cx="12" cy="12" r="8"/>
+										<line x1="12" y1="2" x2="12" y2="4"/>
+										<line x1="12" y1="20" x2="12" y2="22"/>
+										<line x1="2" y1="12" x2="4" y2="12"/>
+										<line x1="20" y1="12" x2="22" y2="12"/>
+									</svg>
 								</button>
 								<button
 									id="btn-refresh-live"
@@ -128,7 +155,9 @@
 									title="Atualizar Sinal"
 									aria-label="Atualizar Sinal"
 								>
-									🔄
+									<svg id="refresh-icon-svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+										<path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-1.19"/>
+									</svg>
 								</button>
 							</div>
 						</div>

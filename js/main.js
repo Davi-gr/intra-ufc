@@ -376,11 +376,19 @@ if (stopsPanelEl && drawerToggleEl) {
 }
 
 // ==========================================================================
-// 5. Rastreamento do Ônibus em Tempo Real
+// 5. Rastreamento do Ônibus em Tempo Real (com Ícone Vetorial SVG)
 // ==========================================================================
 const busIcon = L.divIcon({
 	className: "custom-bus-marker-wrapper",
-	html: `<div class="custom-bus-marker" title="Ônibus Intracampus">🚌</div>`,
+	html: `<div class="custom-bus-marker" title="Ônibus Intracampus">
+		<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+			<path d="M19 17h2l.64-2.54a3 3 0 0 0-.64-2.46L19 10V6a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v4l-2 2a3 3 0 0 0-.64 2.46L3 17h2"/>
+			<path d="M14 17H10"/>
+			<circle cx="7" cy="17" r="1.5" fill="#ffffff"/>
+			<circle cx="17" cy="17" r="1.5" fill="#ffffff"/>
+			<line x1="5" y1="10" x2="19" y2="10"/>
+		</svg>
+	</div>`,
 	iconSize: [38, 38],
 	iconAnchor: [19, 19],
 	popupAnchor: [0, -20],
@@ -443,7 +451,7 @@ function processarDadosOnibus(dados) {
 
 	const popupHtml = `
 		<div style="font-family: var(--font-body); min-width: 170px;">
-			<strong style="font-size: 1rem; color: #1e3a8a;">🚌 Ônibus Intracampus</strong>
+			<strong style="font-size: 1rem; color: #1e3a8a;">Ônibus Intracampus</strong>
 			<hr style="margin: 6px 0; border: none; border-top: 1px solid #e2e8f0;" />
 			<div style="font-size: 0.85rem; line-height: 1.4; color: #334155;">
 				<p style="margin: 2px 0;"><strong>Local:</strong> ${info.onde || "Em trânsito"}</p>
@@ -486,7 +494,7 @@ function lidarComErroRastreamento(erro) {
 				.addTo(map)
 				.bindPopup(`
 					<div style="font-family: var(--font-body);">
-						<strong>🚌 Ônibus Intracampus</strong>
+						<strong>Ônibus Intracampus</strong>
 						<p style="margin: 4px 0 0; color: #64748b; font-size: 0.85rem;">
 							Ponto de partida: ${paradaInicial.nome}<br>
 							(Ative o backend para sinal de GPS ao vivo)
@@ -500,7 +508,7 @@ function lidarComErroRastreamento(erro) {
 }
 
 // ==========================================================================
-// 6. Botões Flutuantes de Ação Rápida (FABs)
+// 6. Botões Flutuantes de Ação Rápida (FABs) & Localização
 // ==========================================================================
 const btnTrackBus = document.getElementById("btn-track-bus");
 const btnMyLocation = document.getElementById("btn-my-location");
@@ -518,62 +526,94 @@ if (btnTrackBus) {
 	});
 }
 
-// Minha Localização (GPS do Smartphone / Navegador)
+// Marcador da localização do usuário
 let userLocationMarker = null;
 
+function definirLocalizacaoUsuario(lat, lng, rotulo = "Você está aqui") {
+	const userPos = [lat, lng];
+	const userIcon = L.divIcon({
+		className: "user-location-marker-wrapper",
+		html: `<div class="user-location-marker" title="${rotulo}"></div>`,
+		iconSize: [18, 18],
+		iconAnchor: [9, 9],
+	});
+
+	if (!userLocationMarker) {
+		userLocationMarker = L.marker(userPos, {
+			icon: userIcon,
+			zIndexOffset: 900,
+			draggable: true,
+		})
+			.addTo(map)
+			.bindPopup(`<strong>${rotulo}</strong><br><small style="color:#64748b">Arraste para ajustar se desejar</small>`);
+	} else {
+		userLocationMarker.setLatLng(userPos);
+		userLocationMarker.setPopupContent(`<strong>${rotulo}</strong><br><small style="color:#64748b">Arraste para ajustar se desejar</small>`);
+	}
+
+	map.flyTo(userPos, 16, { duration: 1.2 });
+	userLocationMarker.openPopup();
+}
+
+// Minha Localização (com suporte seguro a iOS / HTTP e fallback interativo)
 if (btnMyLocation) {
 	btnMyLocation.addEventListener("click", () => {
+		const isLocalhost =
+			window.location.hostname === "localhost" ||
+			window.location.hostname === "127.0.0.1";
+		const isSecure = window.isSecureContext || isLocalhost;
+
+		// Se o navegador bloquear o GPS por falta de HTTPS (comportamento padrão do iOS Safari em IP local HTTP)
+		if (!isSecure && !isLocalhost) {
+			alert(
+				"Por diretrizes de segurança da Apple e do W3C, o GPS no celular exige conexão HTTPS.\n\n" +
+				"Como estamos em teste na rede local (http://192.168...), o Safari bloqueia o GPS automático.\n\n" +
+				"💡 Toque em qualquer lugar no mapa ou selecione uma parada abaixo para posicionar seu ponto de referência!"
+			);
+
+			// Ativa modo de toque no mapa para posicionar marcador
+			map.once("click", (e) => {
+				definirLocalizacaoUsuario(e.latlng.lat, e.latlng.lng, "Ponto definido por você");
+			});
+			return;
+		}
+
 		if (!navigator.geolocation) {
 			alert("Seu navegador não suporta geolocalização.");
 			return;
 		}
 
-		btnMyLocation.style.opacity = "0.5";
+		btnMyLocation.classList.add("spinning");
 
 		navigator.geolocation.getCurrentPosition(
 			(pos) => {
-				btnMyLocation.style.opacity = "1";
-				const userPos = [pos.coords.latitude, pos.coords.longitude];
-
-				const userIcon = L.divIcon({
-					className: "user-location-marker-wrapper",
-					html: `<div class="user-location-marker" title="Você está aqui"></div>`,
-					iconSize: [18, 18],
-					iconAnchor: [9, 9],
-				});
-
-				if (!userLocationMarker) {
-					userLocationMarker = L.marker(userPos, { icon: userIcon, zIndexOffset: 900 })
-						.addTo(map)
-						.bindPopup("<strong>Você está aqui</strong>");
-				} else {
-					userLocationMarker.setLatLng(userPos);
-				}
-
-				map.flyTo(userPos, 16, { duration: 1.2 });
-				userLocationMarker.openPopup();
+				btnMyLocation.classList.remove("spinning");
+				definirLocalizacaoUsuario(pos.coords.latitude, pos.coords.longitude, "Sua localização atual (GPS)");
 			},
 			(erro) => {
-				btnMyLocation.style.opacity = "1";
-				let msg = "Não foi possível obter sua localização.";
+				btnMyLocation.classList.remove("spinning");
+				let msg = "Não foi possível obter a sua localização.";
 				if (erro.code === erro.PERMISSION_DENIED) {
-					msg = "Permissão de localização negada pelo usuário.";
+					msg = "Permissão de localização negada ou bloqueada pelo navegador (no iOS, conexões HTTP locais bloqueiam o GPS).\n\nVocê pode tocar no mapa para marcar seu ponto manualmente.";
 				}
 				alert(msg);
+				map.once("click", (e) => {
+					definirLocalizacaoUsuario(e.latlng.lat, e.latlng.lng, "Ponto definido por você");
+				});
 			},
 			{ enableHighAccuracy: true, timeout: 8000 }
 		);
 	});
 }
 
-// Atualizar Sinal Imediatamente
+// Atualizar Sinal Imediatamente com animação de rotação SVG
 if (btnRefreshLive) {
 	btnRefreshLive.addEventListener("click", () => {
-		btnRefreshLive.style.transform = "rotate(360deg)";
+		btnRefreshLive.classList.add("spinning");
 		buscarPosicaoOnibus().finally(() => {
 			setTimeout(() => {
-				btnRefreshLive.style.transform = "";
-			}, 400);
+				btnRefreshLive.classList.remove("spinning");
+			}, 600);
 		});
 	});
 }
