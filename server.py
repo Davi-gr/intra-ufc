@@ -58,13 +58,12 @@ if __name__ == "__main__":
     local_ip = get_local_ip()
     server_address = ("", PORT)
     httpd = http.server.HTTPServer(server_address, ProxyHTTPRequestHandler)
-    print(f"\n🚍 INTRA UFC - Servidor Ativo e Exposto na Rede Local:")
-    print(f"   💻 No seu Mac:    http://localhost:{PORT}")
-    print(f"   📱 No seu iPhone: http://{local_ip}:{PORT}")
-    print("\n   (Certifique-se de que o iPhone está conectado no mesmo Wi-Fi)")
-    print("   Pressione Ctrl+C para encerrar.\n")
+    print(f"\n[INTRA UFC] Servidor de desenvolvimento ativo:")
+    print(f"  > Local:   http://localhost:{PORT}/")
+    print(f"  > Network: http://{local_ip}:{PORT}/")
+    print("\nPressione Ctrl+C para interromper a execucao.\n")
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
-        print("\nServidor encerrado.")
+        print("\nServidor finalizado.")
 
