@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+1#!/usr/bin/env python3
 """
 Servidor local de desenvolvimento com proxy CORS para o INTRA UFC.
 Uso: python3 server.py [porta] (padrão: 8000)

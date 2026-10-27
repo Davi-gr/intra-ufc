@@ -127,6 +127,25 @@
 			</section>
 		</main>
 
+		<!-- Modal de Instruções de Instalação PWA (Suporte iOS / Safari e outros) -->
+		<div id="pwa-install-modal" class="pwa-modal-overlay" hidden>
+			<div class="pwa-modal-card">
+				<div class="pwa-modal-header">
+					<div class="pwa-app-icon">
+						<img src="icons/icon.svg" alt="Ícone INTRA UFC" width="48" height="48" />
+					</div>
+					<div class="pwa-modal-title-group">
+						<h3>Instalar INTRA UFC</h3>
+						<p>Adicione à tela de início para usar como app</p>
+					</div>
+					<button id="pwa-modal-close" class="pwa-modal-close" type="button" aria-label="Fechar">&times;</button>
+				</div>
+				<div class="pwa-modal-body" id="pwa-modal-body">
+					<!-- Preenchido via JavaScript de acordo com o sistema operacional -->
+				</div>
+			</div>
+		</div>
+
 		<!-- Scripts -->
 		<script
 			src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"

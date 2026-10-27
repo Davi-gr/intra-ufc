@@ -20,32 +20,136 @@ if ("serviceWorker" in navigator) {
 	});
 }
 
-// Suporte à instalação do PWA
+// ==========================================================================
+// 1. Registro do Service Worker & Instalação PWA
+// ==========================================================================
+if ("serviceWorker" in navigator) {
+	window.addEventListener("load", () => {
+		navigator.serviceWorker
+			.register("sw.js")
+			.then((reg) => {
+				console.log("Service Worker do INTRA UFC registrado com sucesso:", reg.scope);
+			})
+			.catch((err) => {
+				console.warn("Falha ao registrar Service Worker:", err);
+			});
+	});
+}
+
+// Suporte à instalação em todas as plataformas (com atenção especial ao iOS/iPhone)
 let promptInstalacao = null;
 const btnInstalar = document.getElementById("pwa-install-btn");
+const modalInstalacao = document.getElementById("pwa-install-modal");
+const modalBody = document.getElementById("pwa-modal-body");
+const modalCloseBtn = document.getElementById("pwa-modal-close");
+
+const isStandalone =
+	window.matchMedia("(display-mode: standalone)").matches ||
+	window.navigator.standalone === true;
+
+const isIOS =
+	/iphone|ipad|ipod/i.test(navigator.userAgent) ||
+	(navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+// Se já estiver rodando como PWA instalado, não precisa exibir o botão
+if (!isStandalone && btnInstalar) {
+	btnInstalar.hidden = false;
+}
 
 window.addEventListener("beforeinstallprompt", (evento) => {
 	evento.preventDefault();
 	promptInstalacao = evento;
-	if (btnInstalar) {
+	if (btnInstalar && !isStandalone) {
 		btnInstalar.hidden = false;
 	}
 });
 
+function abrirModalInstalacao() {
+	if (!modalInstalacao || !modalBody) return;
+
+	if (isIOS) {
+		// Instruções específicas e visuais para iPhone / iPad (Safari)
+		modalBody.innerHTML = `
+			<ul class="pwa-step-list">
+				<li class="pwa-step-item">
+					<span class="pwa-step-num">1</span>
+					<span>Toque no botão de <strong>Compartilhar</strong> <span class="ios-icon-badge">⎋</span> (ícone com quadrado e seta para cima no rodapé do Safari).</span>
+				</li>
+				<li class="pwa-step-item">
+					<span class="pwa-step-num">2</span>
+					<span>Role as opções para baixo e toque em <strong>"Adicionar à Tela de Início"</strong> <span class="ios-icon-badge">➕</span>.</span>
+				</li>
+				<li class="pwa-step-item">
+					<span class="pwa-step-num">3</span>
+					<span>Toque em <strong>"Adicionar"</strong> no canto superior direito para finalizar.</span>
+				</li>
+			</ul>
+			<button class="pwa-modal-btn-action" type="button" id="pwa-modal-entendido">Entendi</button>
+		`;
+	} else {
+		// Outros navegadores sem o evento nativo disparado
+		modalBody.innerHTML = `
+			<p style="color: var(--color-ink); margin-bottom: 1rem; line-height: 1.4;">
+				Para instalar o aplicativo no seu dispositivo:
+			</p>
+			<ul class="pwa-step-list">
+				<li class="pwa-step-item">
+					<span class="pwa-step-num">1</span>
+					<span>Abra o menu do seu navegador (três pontinhos no canto superior).</span>
+				</li>
+				<li class="pwa-step-item">
+					<span class="pwa-step-num">2</span>
+					<span>Selecione <strong>"Instalar aplicativo"</strong> ou <strong>"Adicionar à tela inicial"</strong>.</span>
+				</li>
+			</ul>
+			<button class="pwa-modal-btn-action" type="button" id="pwa-modal-entendido">Entendi</button>
+		`;
+	}
+
+	modalInstalacao.hidden = false;
+
+	const btnEntendido = document.getElementById("pwa-modal-entendido");
+	if (btnEntendido) {
+		btnEntendido.addEventListener("click", () => {
+			modalInstalacao.hidden = true;
+		});
+	}
+}
+
 if (btnInstalar) {
 	btnInstalar.addEventListener("click", async () => {
-		if (!promptInstalacao) return;
-		promptInstalacao.prompt();
-		const resultado = await promptInstalacao.userChoice;
-		if (resultado.outcome === "accepted") {
-			btnInstalar.hidden = true;
+		// 1. Se o navegador suportar o prompt nativo automático (Android / Chrome Desktop)
+		if (promptInstalacao) {
+			promptInstalacao.prompt();
+			const resultado = await promptInstalacao.userChoice;
+			if (resultado.outcome === "accepted") {
+				btnInstalar.hidden = true;
+			}
+			promptInstalacao = null;
+			return;
 		}
-		promptInstalacao = null;
+
+		// 2. No iPhone (iOS) ou navegadores onde a instalação é manual
+		abrirModalInstalacao();
+	});
+}
+
+if (modalCloseBtn && modalInstalacao) {
+	modalCloseBtn.addEventListener("click", () => {
+		modalInstalacao.hidden = true;
+	});
+
+	// Fechar ao clicar no fundo escuro
+	modalInstalacao.addEventListener("click", (e) => {
+		if (e.target === modalInstalacao) {
+			modalInstalacao.hidden = true;
+		}
 	});
 }
 
 window.addEventListener("appinstalled", () => {
 	if (btnInstalar) btnInstalar.hidden = true;
+	if (modalInstalacao) modalInstalacao.hidden = true;
 	console.log("App INTRA UFC instalado com sucesso!");
 });
 
