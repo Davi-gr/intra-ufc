@@ -401,7 +401,7 @@ map.on("click", () => {
 const busIcon = L.divIcon({
 	className: "custom-bus-marker-wrapper",
 	html: `<div class="custom-bus-marker" title="Ônibus Intracampus">
-		<svg viewBox="0 0 240 260" width="24" height="24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+		<svg viewBox="-20 -10 280 280" width="22" height="22" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
 			<rect x="2" y="210" width="16" height="36" rx="8" fill="#0f172a"/>
 			<rect x="222" y="210" width="16" height="36" rx="8" fill="#0f172a"/>
 			<rect x="10" y="20" width="220" height="215" rx="36" fill="#ffffff" stroke="#0f172a" stroke-width="6"/>
