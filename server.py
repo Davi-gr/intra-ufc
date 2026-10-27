@@ -43,9 +43,25 @@ class ProxyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             super().do_GET()
 
 if __name__ == "__main__":
+    import socket
+
+    def get_local_ip():
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(("8.8.8.8", 80))
+            ip = s.getsockname()[0]
+            s.close()
+            return ip
+        except Exception:
+            return "127.0.0.1"
+
+    local_ip = get_local_ip()
     server_address = ("", PORT)
     httpd = http.server.HTTPServer(server_address, ProxyHTTPRequestHandler)
-    print(f"\n🚍 INTRA UFC - Servidor rodando em http://localhost:{PORT}")
+    print(f"\n🚍 INTRA UFC - Servidor Ativo e Exposto na Rede Local:")
+    print(f"   💻 No seu Mac:    http://localhost:{PORT}")
+    print(f"   📱 No seu iPhone: http://{local_ip}:{PORT}")
+    print("\n   (Certifique-se de que o iPhone está conectado no mesmo Wi-Fi)")
     print("   Pressione Ctrl+C para encerrar.\n")
     try:
         httpd.serve_forever()

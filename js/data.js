@@ -9,7 +9,12 @@ const INTRA_DATA = {
 		zoom: 14,
 	},
 	apiAoVivoUrl:
-		window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+		window.location.hostname === "localhost" ||
+		window.location.hostname === "127.0.0.1" ||
+		window.location.hostname.endsWith(".local") ||
+		/^192\.168\./.test(window.location.hostname) ||
+		/^10\./.test(window.location.hostname) ||
+		/^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(window.location.hostname)
 			? "/api/onibus/ao-vivo"
 			: "https://sobral.179.197.66.83.sslip.io/onibus/ao-vivo",
 	intervaloAtualizacaoMs: 10000,
