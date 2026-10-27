@@ -37,6 +37,17 @@
 						</p>
 					</div>
 
+					<div class="live-status-bar">
+						<div class="live-status-indicator">
+							<span class="live-dot waiting" id="live-dot"></span>
+							<span id="live-status-text">Localizando ônibus...</span>
+						</div>
+						<div class="routes-legend">
+							<span class="route-pill"><span class="route-color ida"></span> Ida</span>
+							<span class="route-pill"><span class="route-color volta"></span> Volta</span>
+						</div>
+					</div>
+
 					<div class="map-layout">
 						<div id="map" aria-label="Mapa interativo da UFC Sobral"></div>
 
@@ -45,13 +56,8 @@
 								<p class="eyebrow">Pontos de referencia</p>
 								<h2 id="paradas-titulo">Principais paradas</h2>
 							</div>
-							<ul class="stops-list">
-								<li>Mucambinho</li>
-								<li>FAMED</li>
-								<li>SPA</li>
-								<li>Santa Casa</li>
-								<li>Pedrinhas</li>
-								<li>Cadeia Criativa</li>
+							<ul class="stops-list" id="stops-list">
+								<!-- Preenchido via JavaScript para permitir foco no mapa ao clicar -->
 							</ul>
 						</aside>
 					</div>
@@ -63,6 +69,7 @@
 			integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
 			crossorigin=""
 		></script>
+		<script src="js/data.js"></script>
 		<script src="js/main.js"></script>
 	</body>
 </html>
