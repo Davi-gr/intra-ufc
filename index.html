@@ -39,11 +39,38 @@
 				<span class="brand__title">INTRA UFC</span>
 			</a>
 
-			<!-- Botão de Instalação PWA (visível quando disponível no navegador) -->
+			<!-- Menu de Navegação / Alternância -->
+			<nav class="header-nav">
+				<button id="nav-btn-mapa" class="nav-tab active" type="button">
+					<span class="tab-icon">🗺️</span> <span class="tab-label">Mapa</span>
+				</button>
+				<button id="nav-btn-avisos" class="nav-tab" type="button" aria-haspopup="dialog" aria-expanded="false">
+					<span class="tab-icon">🔔</span> <span class="tab-label">Avisos</span>
+					<span class="nav-badge" id="avisos-badge" hidden>0</span>
+				</button>
+			</nav>
+
+			<!-- Botão de Instalação PWA (oculto quando detectado como instalado) -->
 			<button id="pwa-install-btn" class="btn-install" hidden type="button">
 				<span class="install-icon">📲</span> Instalar App
 			</button>
 		</header>
+
+		<!-- Painel Flutuante / Gaveta de Avisos (Hover / Toque no Mobile) -->
+		<div id="avisos-popover" class="avisos-overlay" hidden>
+			<div class="avisos-sheet">
+				<div class="avisos-header">
+					<div class="avisos-title-area">
+						<h3>📢 Avisos do Intracampus</h3>
+						<p>Prefeitura do Campus — UFC Sobral</p>
+					</div>
+					<button id="avisos-close-btn" class="avisos-close-btn" type="button" aria-label="Fechar avisos">&times;</button>
+				</div>
+				<div id="avisos-list-container" class="avisos-list-container">
+					<!-- Renderizado dinamicamente via JS -->
+				</div>
+			</div>
+		</div>
 
 		<main>
 			<section class="map-section" id="mapa" aria-labelledby="mapa-titulo">

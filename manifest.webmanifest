@@ -2,7 +2,7 @@
   "name": "INTRA UFC — Ônibus Intracampus",
   "short_name": "Intra UFC",
   "description": "Acompanhamento em tempo real, paradas e rotas do transporte intracampus da UFC Sobral.",
-  "start_url": "./index.html",
+  "start_url": "./index.html?origem=pwa",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",

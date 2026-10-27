@@ -43,16 +43,29 @@ const modalInstalacao = document.getElementById("pwa-install-modal");
 const modalBody = document.getElementById("pwa-modal-body");
 const modalCloseBtn = document.getElementById("pwa-modal-close");
 
+// Detecção avançada de Web App instalado
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get("origem") === "pwa") {
+	localStorage.setItem("intra_pwa_instalado", "true");
+}
+
 const isStandalone =
 	window.matchMedia("(display-mode: standalone)").matches ||
-	window.navigator.standalone === true;
+	window.navigator.standalone === true ||
+	urlParams.get("origem") === "pwa" ||
+	localStorage.getItem("intra_pwa_instalado") === "true";
 
 const isIOS =
 	/iphone|ipad|ipod/i.test(navigator.userAgent) ||
 	(navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
-// Se já estiver rodando como PWA instalado, não precisa exibir o botão
-if (!isStandalone && btnInstalar) {
+// Se detectado como Web App instalado, REMOVE completamente o botão de instalar
+if (isStandalone) {
+	localStorage.setItem("intra_pwa_instalado", "true");
+	if (btnInstalar) {
+		btnInstalar.remove();
+	}
+} else if (btnInstalar) {
 	btnInstalar.hidden = false;
 }
 
@@ -85,6 +98,7 @@ function abrirModalInstalacao() {
 				</li>
 			</ul>
 			<button class="pwa-modal-btn-action" type="button" id="pwa-modal-entendido">Entendi</button>
+			<button class="pwa-modal-btn-subtle" type="button" id="pwa-modal-ja-adicionei">Já adicionei à tela de início</button>
 		`;
 	} else {
 		// Outros navegadores sem o evento nativo disparado
@@ -103,6 +117,7 @@ function abrirModalInstalacao() {
 				</li>
 			</ul>
 			<button class="pwa-modal-btn-action" type="button" id="pwa-modal-entendido">Entendi</button>
+			<button class="pwa-modal-btn-subtle" type="button" id="pwa-modal-ja-adicionei">Já adicionei à tela de início</button>
 		`;
 	}
 
@@ -111,6 +126,15 @@ function abrirModalInstalacao() {
 	const btnEntendido = document.getElementById("pwa-modal-entendido");
 	if (btnEntendido) {
 		btnEntendido.addEventListener("click", () => {
+			modalInstalacao.hidden = true;
+		});
+	}
+
+	const btnJaAdicionei = document.getElementById("pwa-modal-ja-adicionei");
+	if (btnJaAdicionei) {
+		btnJaAdicionei.addEventListener("click", () => {
+			localStorage.setItem("intra_pwa_instalado", "true");
+			if (btnInstalar) btnInstalar.remove();
 			modalInstalacao.hidden = true;
 		});
 	}
@@ -123,7 +147,8 @@ if (btnInstalar) {
 			promptInstalacao.prompt();
 			const resultado = await promptInstalacao.userChoice;
 			if (resultado.outcome === "accepted") {
-				btnInstalar.hidden = true;
+				localStorage.setItem("intra_pwa_instalado", "true");
+				btnInstalar.remove();
 			}
 			promptInstalacao = null;
 			return;
@@ -148,10 +173,120 @@ if (modalCloseBtn && modalInstalacao) {
 }
 
 window.addEventListener("appinstalled", () => {
-	if (btnInstalar) btnInstalar.hidden = true;
+	localStorage.setItem("intra_pwa_instalado", "true");
+	if (btnInstalar) btnInstalar.remove();
 	if (modalInstalacao) modalInstalacao.hidden = true;
 	console.log("App INTRA UFC instalado com sucesso!");
 });
+
+// ==========================================================================
+// 2. Gestão de Avisos e Menu Superior
+// ==========================================================================
+const navBtnMapa = document.getElementById("nav-btn-mapa");
+const navBtnAvisos = document.getElementById("nav-btn-avisos");
+const avisosBadge = document.getElementById("avisos-badge");
+const avisosPopover = document.getElementById("avisos-popover");
+const avisosCloseBtn = document.getElementById("avisos-close-btn");
+const avisosListContainer = document.getElementById("avisos-list-container");
+
+let avisosAtivos = [...(INTRA_DATA.avisos || [])];
+
+function renderizarAvisos() {
+	if (!avisosListContainer) return;
+
+	if (avisosBadge) {
+		if (avisosAtivos.length > 0) {
+			avisosBadge.textContent = avisosAtivos.length;
+			avisosBadge.hidden = false;
+		} else {
+			avisosBadge.hidden = true;
+		}
+	}
+
+	if (avisosAtivos.length === 0) {
+		// Quando não há nenhum aviso
+		avisosListContainer.innerHTML = `
+			<div class="avisos-empty-state">
+				<div class="avisos-empty-icon" aria-hidden="true">✓</div>
+				<h4 class="avisos-empty-title">Nenhum aviso no momento</h4>
+				<p class="avisos-empty-desc">
+					O transporte intracampus da UFC Sobral está operando normalmente em todas as rotas e horários previstos.
+				</p>
+			</div>
+		`;
+		return;
+	}
+
+	// Renderizar cards de avisos
+	avisosListContainer.innerHTML = avisosAtivos
+		.map((aviso) => {
+			const tipo = aviso.tipo || "info";
+			const labelTipo = tipo === "urgente" ? "Urgente" : tipo === "alerta" ? "Atenção" : "Informativo";
+			return `
+				<article class="aviso-card ${tipo}">
+					<div class="aviso-card-meta">
+						<span class="aviso-card-tag">${labelTipo}</span>
+						<span class="aviso-card-date">${aviso.data || "Recente"}</span>
+					</div>
+					<h4 class="aviso-card-title">${aviso.titulo}</h4>
+					<p class="aviso-card-message">${aviso.mensagem}</p>
+				</article>
+			`;
+		})
+		.join("");
+}
+
+function abrirAvisos() {
+	renderizarAvisos();
+	if (avisosPopover) avisosPopover.hidden = false;
+	if (navBtnAvisos) {
+		navBtnAvisos.classList.add("active");
+		navBtnAvisos.setAttribute("aria-expanded", "true");
+	}
+	if (navBtnMapa) navBtnMapa.classList.remove("active");
+}
+
+function fecharAvisos() {
+	if (avisosPopover) avisosPopover.hidden = true;
+	if (navBtnAvisos) {
+		navBtnAvisos.classList.remove("active");
+		navBtnAvisos.setAttribute("aria-expanded", "false");
+	}
+	if (navBtnMapa) navBtnMapa.classList.add("active");
+}
+
+if (navBtnAvisos) {
+	navBtnAvisos.addEventListener("click", () => {
+		if (avisosPopover && !avisosPopover.hidden) {
+			fecharAvisos();
+		} else {
+			abrirAvisos();
+		}
+	});
+}
+
+if (navBtnMapa) {
+	navBtnMapa.addEventListener("click", () => {
+		fecharAvisos();
+	});
+}
+
+if (avisosCloseBtn) {
+	avisosCloseBtn.addEventListener("click", () => {
+		fecharAvisos();
+	});
+}
+
+if (avisosPopover) {
+	avisosPopover.addEventListener("click", (e) => {
+		if (e.target === avisosPopover) {
+			fecharAvisos();
+		}
+	});
+}
+
+// Inicializar renderização dos avisos
+renderizarAvisos();
 
 // ==========================================================================
 // 2. Inicialização do Mapa Leaflet

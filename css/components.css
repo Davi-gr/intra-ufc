@@ -586,5 +586,290 @@
 	background: #0f1c26;
 }
 
+.pwa-modal-btn-subtle {
+	width: 100%;
+	margin-top: 0.65rem;
+	padding: 0.65rem;
+	background: transparent;
+	color: var(--color-muted);
+	border: 1px dashed var(--color-line);
+	border-radius: 10px;
+	font-family: inherit;
+	font-size: 0.85rem;
+	cursor: pointer;
+	transition: background 0.15s ease, color 0.15s ease;
+}
+
+.pwa-modal-btn-subtle:hover {
+	background: rgba(23, 43, 58, 0.04);
+	color: var(--color-ink);
+}
+
+/* ==========================================================================
+   Menu Superior de Navegação (Mapa / Avisos)
+   ========================================================================== */
+.header-nav {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	margin: 0 auto 0 1rem;
+	background: rgba(23, 43, 58, 0.05);
+	padding: 3px;
+	border-radius: 999px;
+}
+
+.nav-tab {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	padding: 0.4rem 0.85rem;
+	border: none;
+	border-radius: 999px;
+	background: transparent;
+	color: var(--color-muted);
+	font-family: var(--font-body);
+	font-size: 0.82rem;
+	font-weight: 700;
+	cursor: pointer;
+	transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+	touch-action: manipulation;
+}
+
+.nav-tab:hover {
+	color: var(--color-ink);
+}
+
+.nav-tab.active {
+	background: var(--color-surface);
+	color: var(--color-ink);
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.nav-badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 16px;
+	height: 16px;
+	padding: 0 4px;
+	border-radius: 8px;
+	background: var(--color-accent);
+	color: #ffffff;
+	font-size: 0.65rem;
+	font-weight: 800;
+}
+
+/* ==========================================================================
+   Painel / Overlay de Avisos (Mobile-First / Popover)
+   ========================================================================== */
+.avisos-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(15, 23, 42, 0.6);
+	backdrop-filter: blur(4px);
+	-webkit-backdrop-filter: blur(4px);
+	z-index: 9999;
+	display: flex;
+	align-items: flex-end; /* No mobile abre no rodapé */
+	justify-content: center;
+	padding: 0;
+	animation: pwaFadeIn 0.2s ease-out;
+}
+
+.avisos-overlay[hidden] {
+	display: none;
+}
+
+@media (min-width: 640px) {
+	.avisos-overlay {
+		align-items: center;
+		padding: 1.5rem;
+	}
+}
+
+.avisos-sheet {
+	background: var(--color-surface);
+	border: 1px solid var(--color-line);
+	border-top-left-radius: 20px;
+	border-top-right-radius: 20px;
+	width: 100%;
+	max-width: 480px;
+	max-height: 85vh;
+	display: flex;
+	flex-direction: column;
+	padding: 1.5rem;
+	box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.25);
+	animation: pwaSlideUp 0.25s ease-out;
+	padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 1rem));
+}
+
+@media (min-width: 640px) {
+	.avisos-sheet {
+		border-radius: 20px;
+		box-shadow: 0 20px 30px rgba(0, 0, 0, 0.25);
+	}
+}
+
+.avisos-header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	margin-bottom: 1.25rem;
+	padding-bottom: 0.85rem;
+	border-bottom: 1px solid var(--color-line);
+}
+
+.avisos-title-area h3 {
+	margin: 0;
+	font-size: 1.2rem;
+	color: var(--color-ink);
+}
+
+.avisos-title-area p {
+	margin: 2px 0 0;
+	font-size: 0.82rem;
+	color: var(--color-muted);
+}
+
+.avisos-close-btn {
+	width: 32px;
+	height: 32px;
+	background: rgba(23, 43, 58, 0.06);
+	border: none;
+	border-radius: 50%;
+	font-size: 1.4rem;
+	color: var(--color-muted);
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
+	transition: background 0.15s ease;
+}
+
+.avisos-close-btn:hover {
+	background: rgba(23, 43, 58, 0.14);
+}
+
+.avisos-list-container {
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 0.85rem;
+	padding-right: 4px;
+}
+
+/* Estado de lista vazia (quando não há nenhum aviso) */
+.avisos-empty-state {
+	text-align: center;
+	padding: 2.5rem 1rem;
+	background: rgba(23, 43, 58, 0.03);
+	border: 1px dashed var(--color-line);
+	border-radius: 14px;
+}
+
+.avisos-empty-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 56px;
+	height: 56px;
+	margin-bottom: 0.85rem;
+	border-radius: 50%;
+	background: #dcfce7;
+	color: #16a34a;
+	font-size: 1.8rem;
+}
+
+.avisos-empty-title {
+	font-family: var(--font-display);
+	font-size: 1.25rem;
+	color: var(--color-ink);
+	margin-bottom: 0.4rem;
+}
+
+.avisos-empty-desc {
+	margin: 0;
+	font-size: 0.88rem;
+	color: var(--color-muted);
+	line-height: 1.45;
+}
+
+/* Card individual de aviso */
+.aviso-card {
+	padding: 1rem 1.15rem;
+	border-radius: 12px;
+	background: #ffffff;
+	border: 1px solid var(--color-line);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+	position: relative;
+}
+
+.aviso-card.alerta {
+	border-left: 4px solid #f59e0b;
+}
+
+.aviso-card.urgente {
+	border-left: 4px solid #dc2626;
+}
+
+.aviso-card.info {
+	border-left: 4px solid #0d6efd;
+}
+
+.aviso-card-meta {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 0.4rem;
+}
+
+.aviso-card-tag {
+	font-size: 0.7rem;
+	font-weight: 800;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	padding: 2px 6px;
+	border-radius: 4px;
+}
+
+.aviso-card.info .aviso-card-tag {
+	background: #e0f2fe;
+	color: #0369a1;
+}
+
+.aviso-card.alerta .aviso-card-tag {
+	background: #fef3c7;
+	color: #b45309;
+}
+
+.aviso-card.urgente .aviso-card-tag {
+	background: #fee2e2;
+	color: #b91c1c;
+}
+
+.aviso-card-date {
+	font-size: 0.75rem;
+	color: var(--color-muted);
+}
+
+.aviso-card-title {
+	margin: 0 0 0.35rem;
+	font-size: 0.95rem;
+	font-weight: 700;
+	color: var(--color-ink);
+}
+
+.aviso-card-message {
+	margin: 0;
+	font-size: 0.85rem;
+	color: #475569;
+	line-height: 1.45;
+}
+
+
 
 

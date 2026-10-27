@@ -18,6 +18,16 @@ const INTRA_DATA = {
 			? "/api/onibus/ao-vivo"
 			: "https://sobral.179.197.66.83.sslip.io/onibus/ao-vivo",
 	intervaloAtualizacaoMs: 10000,
+	avisos: [
+		// Deixe a lista vazia [] ou adicione avisos da prefeitura do campus:
+		// {
+		// 	id: "aviso-1",
+		// 	data: "Hoje, 17:00",
+		// 	titulo: "Operação Normal",
+		// 	mensagem: "Transporte operando normalmente com saídas regulares do Mucambinho.",
+		// 	tipo: "info", // "info", "alerta", "urgente"
+		// },
+	],
 	paradas: [
 		{ id: "mucambinho", nome: "Campus Mucambinho", lat: -3.6924258, lng: -40.3551757 },
 		{ id: "santacasa", nome: "Santa Casa", lat: -3.6926081, lng: -40.3585607 },
