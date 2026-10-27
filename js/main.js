@@ -401,21 +401,21 @@ map.on("click", () => {
 const busIcon = L.divIcon({
 	className: "custom-bus-marker-wrapper",
 	html: `<div class="custom-bus-marker" title="Ônibus Intracampus">
-		<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-			<path d="M4 6L2 7"/>
-			<path d="M20 6l2 1"/>
-			<rect x="4" y="3" width="16" height="16" rx="2.5"/>
-			<path d="M4 11h16"/>
-			<line x1="9" y1="6" x2="15" y2="6"/>
-			<circle cx="8" cy="15" r="1.3" fill="#ffffff"/>
-			<circle cx="16" cy="15" r="1.3" fill="#ffffff"/>
-			<path d="M6 19v2.5"/>
-			<path d="M18 19v2.5"/>
+		<svg viewBox="0 0 240 260" width="24" height="24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+			<rect x="2" y="210" width="16" height="36" rx="8" fill="#0f172a"/>
+			<rect x="222" y="210" width="16" height="36" rx="8" fill="#0f172a"/>
+			<rect x="10" y="20" width="220" height="215" rx="36" fill="#ffffff" stroke="#0f172a" stroke-width="6"/>
+			<path d="M 12,125 L 228,125 L 228,200 Q 228,232 194,232 L 46,232 Q 12,232 12,200 Z" fill="#e2e8f0"/>
+			<rect x="30" y="44" width="180" height="68" rx="14" fill="#172b3a"/>
+			<rect x="70" y="28" width="100" height="9" rx="4.5" fill="#e86a3a"/>
+			<circle cx="50" cy="165" r="14" fill="#fbbf24"/>
+			<circle cx="190" cy="165" r="14" fill="#fbbf24"/>
+			<rect x="85" y="160" width="70" height="12" rx="6" fill="#94a3b8"/>
 		</svg>
 	</div>`,
-	iconSize: [38, 38],
-	iconAnchor: [19, 19],
-	popupAnchor: [0, -20],
+	iconSize: [40, 40],
+	iconAnchor: [20, 20],
+	popupAnchor: [0, -22],
 });
 
 let busMarker = null;
