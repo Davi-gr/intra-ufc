@@ -422,6 +422,7 @@ let busMarker = null;
 let ultimaPosicaoOnibus = null;
 const liveDotEl = document.getElementById("live-dot");
 const liveStatusTextEl = document.getElementById("live-status-text");
+const arrivalEstimateEl = document.getElementById("arrival-estimate");
 
 function formatarTempo(segundos) {
 	if (segundos < 60) return `${segundos}s`;
@@ -466,6 +467,7 @@ async function buscarPosicaoOnibus() {
 function processarDadosOnibus(dados) {
 	if (!dados.visivel || !dados.onibus || dados.onibus.length === 0) {
 		atualizarStatusUI("espera", dados.motivo || "Ônibus fora de operação no momento.");
+		ocultarEstimativaChegada("Ônibus fora de operação no momento.");
 		return;
 	}
 
@@ -500,10 +502,84 @@ function processarDadosOnibus(dados) {
 	} else {
 		atualizarStatusUI("online", `Ônibus em tempo real — ${info.onde || "Em movimento"}`);
 	}
+	atualizarEstimativaChegada(info);
+}
+
+function distanciaKmLatLng(posA, posB) {
+	return L.latLng(posA[0], posA[1]).distanceTo(L.latLng(posB[0], posB[1])) / 1000;
+}
+
+function distanciaRestanteNaRota(parada, coordenadas, posBus) {
+	let busMaisProximo = 0;
+	let paradaMaisProxima = 0;
+	let distanciaBus = Infinity;
+	let distanciaParada = Infinity;
+
+	for (let i = 0; i < coordenadas.length; i++) {
+		const atualBus = distanciaKmLatLng(posBus, coordenadas[i]);
+		const atualParada = distanciaKmLatLng([parada.lat, parada.lng], coordenadas[i]);
+		if (atualBus < distanciaBus) {
+			distanciaBus = atualBus;
+			busMaisProximo = i;
+		}
+		if (atualParada < distanciaParada) {
+			distanciaParada = atualParada;
+			paradaMaisProxima = i;
+		}
+	}
+
+	const acumulada = [0];
+	let total = 0;
+	for (let i = 1; i < coordenadas.length; i++) {
+		total += distanciaKmLatLng(coordenadas[i - 1], coordenadas[i]);
+		acumulada[i] = total;
+	}
+
+	let restante = acumulada[paradaMaisProxima] - acumulada[busMaisProximo];
+	if (restante < 0) restante += total;
+
+	const distanciaReferencia = distanciaBus + distanciaParada;
+	return { restante, distanciaReferencia };
+}
+
+function obterEstimativaChegada(parada, info) {
+	const posBus = [info.lat, info.lng];
+	const candidatos = [
+		distanciaRestanteNaRota(parada, INTRA_DATA.rotas.ida.coordenadas, posBus),
+		distanciaRestanteNaRota(parada, INTRA_DATA.rotas.volta.coordenadas, posBus),
+	];
+	const melhor = candidatos.reduce((atual, candidato) =>
+		candidato.distanciaReferencia < atual.distanciaReferencia ? candidato : atual
+	);
+	const velocidadeApi = Number(info.velocidade_kmh);
+	const velocidadeKmh = Number.isFinite(velocidadeApi) && velocidadeApi > 0 ? velocidadeApi : 20;
+	const minutos = Math.max(1, Math.ceil((melhor.restante / velocidadeKmh) * 60));
+	return minutos;
+}
+
+function atualizarEstimativaChegada(info) {
+	if (!arrivalEstimateEl || Number(info.ha_segundos) > 300) {
+		ocultarEstimativaChegada("Posição sem atualização recente.");
+		return;
+	}
+
+	const mucambinho = INTRA_DATA.paradas.find((parada) => parada.id === "mucambinho");
+	if (!mucambinho) return;
+
+	const minutos = obterEstimativaChegada(mucambinho, info);
+	arrivalEstimateEl.hidden = false;
+	arrivalEstimateEl.textContent = `Estimativa ao Mucambinho: ~${minutos} min (pode variar)`;
+}
+
+function ocultarEstimativaChegada(texto) {
+	if (!arrivalEstimateEl) return;
+	arrivalEstimateEl.hidden = false;
+	arrivalEstimateEl.textContent = `Estimativa indisponível: ${texto}`;
 }
 
 function lidarComErroRastreamento(erro) {
 	const ehErroRedeOuCors = erro.name === "TypeError" || erro.name === "AbortError";
+	ocultarEstimativaChegada("sem sinal da API.");
 
 	if (ehErroRedeOuCors) {
 		atualizarStatusUI(
