@@ -148,6 +148,15 @@ main {
 	font-size: 0.82rem;
 }
 
+.arrival-estimate {
+	position: absolute;
+	top: 63px;
+	left: 12px;
+	right: 12px;
+	z-index: 1000;
+	margin: 0;
+}
+
 /* Posiciona os botões de zoom (+ / -) abaixo da barra de status no mobile */
 .leaflet-top.leaflet-right {
 	top: 96px;
