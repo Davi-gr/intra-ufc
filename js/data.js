@@ -18,6 +18,21 @@ const INTRA_DATA = {
 			? "/api/onibus/ao-vivo"
 			: "https://sobral.179.197.66.83.sslip.io/onibus/ao-vivo",
 	intervaloAtualizacaoMs: 10000,
+	horariosSaidaMucambinho: [
+		"07:00",
+		"07:45",
+		"09:00",
+		"10:00",
+		"11:00",
+		"11:50",
+		"12:40",
+		"13:30",
+		"14:10",
+		"17:20",
+		"18:20",
+		"19:20",
+		"22:00",
+	],
 	avisos: [
 		// Deixe a lista vazia [] ou adicione avisos da prefeitura do campus:
 		// {

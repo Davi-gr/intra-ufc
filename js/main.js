@@ -330,6 +330,62 @@ const rotaVoltaLayer = L.polyline(INTRA_DATA.rotas.volta.coordenadas, {
 // ==========================================================================
 const marcadoresParadas = {};
 const stopsListEl = document.getElementById("stops-list");
+const scheduleListEl = document.getElementById("schedule-list");
+const nextDepartureEl = document.getElementById("next-departure");
+
+function renderizarHorarios() {
+	if (!scheduleListEl) return;
+	scheduleListEl.innerHTML = INTRA_DATA.horariosSaidaMucambinho
+		.map((horario) => `<li>${horario}</li>`)
+		.join("");
+	atualizarProximaSaida();
+}
+
+function minutosParaHorario(horario) {
+	const [hora, minuto] = horario.split(":").map(Number);
+	const agora = new Date();
+	const horarioSaida = new Date(agora);
+	horarioSaida.setHours(hora, minuto, 0, 0);
+	return { horarioSaida, minutos: Math.ceil((horarioSaida - agora) / 60000) };
+}
+
+function atualizarProximaSaida() {
+	if (!nextDepartureEl) return;
+
+	let proxima = null;
+	for (const horario of INTRA_DATA.horariosSaidaMucambinho) {
+		const candidato = minutosParaHorario(horario);
+		if (candidato.minutos >= 0) {
+			proxima = candidato;
+			break;
+		}
+	}
+
+	if (!proxima) {
+		const [hora, minuto] = INTRA_DATA.horariosSaidaMucambinho[0].split(":").map(Number);
+		const agora = new Date();
+		const amanha = new Date(agora);
+		amanha.setDate(amanha.getDate() + 1);
+		amanha.setHours(hora, minuto, 0, 0);
+		const minutos = Math.ceil((amanha - agora) / 60000);
+		nextDepartureEl.textContent = `Próxima: amanhã às ${INTRA_DATA.horariosSaidaMucambinho[0]} (${formatarDuracao(minutos)})`;
+		return;
+	}
+
+	const horario = `${String(proxima.horarioSaida.getHours()).padStart(2, "0")}:${String(proxima.horarioSaida.getMinutes()).padStart(2, "0")}`;
+	nextDepartureEl.textContent = `Próxima: ${horario} (${formatarDuracao(proxima.minutos)})`;
+}
+
+function formatarDuracao(minutos) {
+	if (minutos <= 0) return "saindo agora";
+	if (minutos < 60) return `em ${minutos} min`;
+	const horas = Math.floor(minutos / 60);
+	const restante = minutos % 60;
+	return restante ? `em ${horas} h ${restante} min` : `em ${horas} h`;
+}
+
+renderizarHorarios();
+setInterval(atualizarProximaSaida, 60000);
 
 INTRA_DATA.paradas.forEach((parada, index) => {
 	const stopIcon = L.divIcon({
