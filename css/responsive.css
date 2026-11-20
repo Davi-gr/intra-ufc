@@ -39,11 +39,6 @@ body {
 }
 
 @media (max-width: 520px) {
-	/* No celular compacto, esconde o texto 'INTRA UFC' e mantém o ícone oficial [IU] */
-	.brand__title {
-		display: none;
-	}
-
 	.brand__mark {
 		width: 1.85rem;
 		height: 1.85rem;
@@ -68,6 +63,10 @@ body {
 }
 
 @media (max-width: 360px) {
+	.brand__title {
+		display: none;
+	}
+
 	.btn-install {
 		width: 34px;
 		height: 34px;
